@@ -1,0 +1,81 @@
+html{
+    background: url('../img/frog_regular.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+body{
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* @media all and (min-width: 1080px){
+    body{
+        overflow: hidden;
+    }
+} */
+
+table{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table, th, td {
+    border-spacing: 0.3rem;
+}
+
+td {
+    /* border: 1px solid black; */
+    padding: 1rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 10px;
+    background-color: beige;
+}
+
+td:hover {
+    background-color: lightblue;
+}
+
+h1{
+    font-size: 4rem;
+    margin: 0.2rem 1rem;
+}
+
+.main-div{
+    display: flex;
+    flex-direction: row;
+}
+
+.first-col-div{
+    width: 50%;
+    /* height: 100vh; */
+    text-align: center;
+}
+
+.second-col-div{
+    width: 50%;
+    /* height: 100vh; */
+    padding: 0.8rem;
+}
+
+.mountain{
+    background-color: #b37a4f;
+}
+
+.farm{
+    background-color: #ffff52;
+}
+
+.forest{
+    background-color: #3b7c48;
+}
+
+.water{
+    background-color: #5787bf;
+}
+
+.town{
+    background-color: #b75353;
+}
