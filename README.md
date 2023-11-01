@@ -11,7 +11,7 @@ saját munkájaként mutatja be, az fegyelmi vétségnek számít.
 A fegyelmi vétség legsúlyosabb következménye a hallgató elbocsátása az egyetemről.
 
 ### Minimálisan teljesítendő (enélkül nem fogadjuk el, 8 pont)
-[ ] Négyzetrács: A játék elindítása után kirajzolódik a 11x11 térkép kirajzolása a hegyekkel a megfelelő helyen. (1 pont)<br />
+[x] Négyzetrács: A játék elindítása után kirajzolódik a 11x11 térkép kirajzolása a hegyekkel a megfelelő helyen. (1 pont)<br />
 [ ] Lehelyezés: A térképelemek közül egy véletlenszerűen megjelenik a hozzájuk tartozó időegységekkel. (1 pont)<br />
 [ ] Lehelyezés: A térképelemet le tudjuk helyezni a négyzetrácsra (bárhova). (2 pont)<br />
 [ ] Idő: A játék 28 időegységig tart, és a térképelemek lehelyezésével kivonja a térképelemhez tartozó időegységet belőle. (1 pont)<br />
