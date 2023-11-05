@@ -34,10 +34,6 @@ td {
     background-color: beige;
 }
 
-td:hover {
-    background-color: lightblue;
-}
-
 h1{
     font-size: 4rem;
     margin: 0.2rem 1rem;
@@ -58,6 +54,10 @@ h1{
     width: 50%;
     /* height: 100vh; */
     padding: 0.8rem;
+}
+
+.hover{
+    background-color: gray;
 }
 
 .mountain{

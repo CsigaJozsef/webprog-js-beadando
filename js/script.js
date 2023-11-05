@@ -1,33 +1,42 @@
 //hegyek:
 //(sor, oszlop) => (2,2), (4,9), (6,4), (9,10), (10,6)
-const mountains = [
-    {
-        "x":1,
-        "y":1
-    },
-    {
-        "x":3,
-        "y":8
-    },
-    {
-        "x":5,
-        "y":3
-    },
-    {
-        "x":8,
-        "y":9
-    },
-    {
-        "x":9,
-        "y":5
-    }
-]
 
+//---------------------------main----------------------------------
 const board = document.querySelector("#gameboard")
+const actElement = document.querySelector("#act-element")
+const elementSize = 3;
 
-generateTable(11);
+let actualElement;
+
+generateTable(11, board);
 placeMountains();
+generateTable(3, actElement)
+actualElement = getActualElement()
+drawActualElement(actualElement, actElement)
 
+delegate(board, "mouseover", "td", mouseHoverEnter)
+delegate(board, "mouseout", "td", mouseHoverLeave)
+
+
+//---------------------------functions--------------------------------
+
+function mouseHoverEnter(event){
+    console.log("HELO")
+    console.log(event)
+    console.log(this)
+    this.style.backgroundColor = "gray"
+}
+
+function hello(){
+    console.log('SUP')
+}
+
+function mouseHoverLeave(event){
+    console.log("BYE")
+    this.style.backgroundColor = "beige"
+}
+
+//places predetermined constant mountains on gameboard
 function placeMountains(){
 
     mountains.forEach(m => {
@@ -36,7 +45,38 @@ function placeMountains(){
     })
 }
 
-function generateTable(n){
+function getRandomInteger(max){
+    return Math.floor(Math.random() * max);
+}
+
+//picks random from elements
+function getActualElement(){
+    max = elements.length
+    indexOfChosenOne = getRandomInteger(max)
+
+    return elements[indexOfChosenOne]
+}
+
+//draws to act-element board (might rework for all purpose later)
+function drawActualElement(elementToDraw, targetTable){
+    
+    elementShape = elementToDraw.shape
+    elementType = elementToDraw.type
+    
+    for(let i = 0; i < elementSize; ++i){
+        for(let j = 0; j < elementSize; ++j){
+            
+            if(elementShape[i][j]){
+                
+                td = targetTable.rows[i].cells[j]
+                td.setAttribute("class", elementType)
+
+            }
+        }
+    }
+}
+
+function generateTable(n, t){
 
     for(let i = 0; i < n; ++i){
 
@@ -50,7 +90,7 @@ function generateTable(n){
             console.log("i: "+i+", j: "+j)
         }
 
-        board.appendChild(tr)
+        t.appendChild(tr)
 
     }
 }
