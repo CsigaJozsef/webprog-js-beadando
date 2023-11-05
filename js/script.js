@@ -17,23 +17,56 @@ drawActualElement(actualElement, actElement)
 delegate(board, "mouseover", "td", mouseHoverEnter)
 delegate(board, "mouseout", "td", mouseHoverLeave)
 
+delegate(board, "click", "td", placeElement)
+
 
 //---------------------------functions--------------------------------
 
-function mouseHoverEnter(event){
-    console.log("HELO")
-    console.log(event)
-    console.log(this)
-    this.style.backgroundColor = "gray"
+function placeElement(event){
+
 }
 
-function hello(){
-    console.log('SUP')
+function mouseHoverEnter(event){
+
+    elementShape = actualElement.shape
+
+    cellI = this.cellIndex
+    rowI = this.closest('tr').rowIndex
+
+    let hoverArray = []                 //for 3x3 tds to draw out placable element
+
+    for(let i = 0; i < elementSize; ++i){
+        for(let j = 0; j < elementSize; ++j){
+
+            if(rowI-1+i < 0 || rowI-1+i > 10 || cellI-1+j < 0 || cellI-1+j > 10){
+                continue;
+            }
+
+            td = board.rows[rowI-1+i].cells[cellI-1+j]
+
+            if(elementShape[i][j]){
+                td.style.backgroundColor = "grey"
+            }
+        }
+    }
 }
 
 function mouseHoverLeave(event){
-    console.log("BYE")
-    this.style.backgroundColor = "beige"
+
+    cellI = this.cellIndex
+    rowI = this.closest('tr').rowIndex
+
+    for(let i = 0; i < elementSize; ++i){
+        for(let j = 0; j < elementSize; ++j){
+
+            if(rowI-1+i < 0 || rowI-1+i > 10 || cellI-1+j < 0 || cellI-1+j > 10){
+                continue;
+            }
+
+            td = board.rows[rowI-1+i].cells[cellI-1+j]
+            td.style.backgroundColor = ""
+        }
+    }
 }
 
 //places predetermined constant mountains on gameboard
