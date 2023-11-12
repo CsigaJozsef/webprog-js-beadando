@@ -1,5 +1,7 @@
 html{
-    background: url('../img/frog_regular.png') no-repeat center center fixed; 
+    /* background: url('../img/frog_regular.png') no-repeat center center fixed;  */
+    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+                  url("../img/potato.jpg");
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -31,7 +33,7 @@ table, th, td {
 }
 
 td {
-    /* border: 1px solid black; */
+    border: 2px solid rgb(80, 80, 80);
     padding: 1rem;
     width: 2rem;
     height: 2rem;
@@ -42,6 +44,23 @@ td {
 h1{
     font-size: 4rem;
     margin: 0.2rem 1rem;
+}
+
+#seasons-table{
+    table-layout: fixed;
+    width: 75%;
+}
+
+#challenges{
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 0.5rem;
+}
+
+#challenges td{
+    height: 4rem;
+    padding: 0 10px;
+    font-size: 0.95rem;
 }
 
 .main-div{

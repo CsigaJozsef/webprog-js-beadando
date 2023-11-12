@@ -28,28 +28,41 @@
 
         <div class="second-col-div">
             
-            <p>
-                Nekeresdország szomszédjában egy hatalmas ország, a Burgonyák Birodalom helyezkedik el,
-                amelynek sok része mind a mai napig ismeretlen és lakatlan. Ennek uralkodója, 
-                Pityóka császárnő elrendelte ezeknek a területeknek a feltérképezését és benépesítését. 
-                Első lépésként a táj felderítésére Téged mint birodalmi térképészt bízott meg. 
-                A császárnő küldetésekkel határozza meg, hogy milyen tájakat szeretne látni a birodalmában. 
-                Segíts neki, minél jobban teljesíteni a kívánságait, így a Te hírneved is ennek megfelelően növekedhet!
-            </p>
+            <table id="seasons-table">
+                <tr>
+                    <td>Tavasz:<br><span id="spring-points-span">0 pont</span></td>
+                    <td>Nyár:<br><span id="summer-points-span">0 pont</span></td>
+                    <td>Ősz:<br><span id="autumn-points-span">0 pont</span></td>
+                    <td>Tél:<br><span id="winter-points-span">0 pont</span></td>
+                </tr>
+            </table>
+            <p id="summed-points-paragraph">Összpontszám: 0 pont</p>
+            <p id="actual-season-paragraph">Jelenlegi évszak: Tavasz</p>
             
             <hr>
             
             <table id="challenges"></table>
-            
-            <span id="time-left-span"></span>
+            <p id="time-left-paragraph"></p>
             
             <hr>
+            
+            <div class="main-div">
 
-            <button id="rotate-element">Forgatás</button>
-            <button id="mirror-element">Tükrözés</button>
-            <span id="act-element-time"></span>
-            <table id="act-element-board"></table>
+                <div class="first-col-div">
 
+                    <p>Aktuális elem:</p>
+                    <button id="rotate-element">Forgatás</button>
+                    <button id="mirror-element">Tükrözés</button>
+                    <span id="act-element-time"></span>
+
+                </div>
+                
+                <div class="second-col-div">
+        
+                    <table id="act-element-board"></table>
+
+                </div>
+            </div>    
         </div>
     </div>
     
