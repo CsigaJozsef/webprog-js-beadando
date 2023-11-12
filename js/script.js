@@ -5,9 +5,15 @@
 const board = document.querySelector("#gameboard")
 const actElementBoard = document.querySelector("#act-element-board")
 const actElementTimeSpan = document.querySelector("#act-element-time")
+const rotateButton = document.querySelector("#rotate-element")
+const mirrorButton = document.querySelector("#mirror-element")
+const timeLeftSpan = document.querySelector("#time-left-span")
+const challengesTable = document.querySelector("#challenges")
 const elementSize = 3;
+const year = 28;
 
 let actualElement;
+let actualDate = 0;
 
 generateTable(11, board);
 placeMountains();
@@ -15,14 +21,66 @@ generateTable(3, actElementBoard)
 rerollActualElement();
 drawActualElement(actualElement, actElementBoard)
 setActualElementTime(actualElement.time ,actElementTimeSpan)
+displayActualTime()
 
 delegate(board, "mouseover", "td", mouseHoverEnter)
 delegate(board, "mouseout", "td", mouseHoverLeave)
 
 delegate(board, "click", "td", placeElement)
 
+delegate(rotateButton, "click", "button", rotateActualElementShape)
+delegate(mirrorButton, "click", "button", mirrorActualElementShape)
+
+
 
 //---------------------------functions--------------------------------
+
+function displayActualTime(){
+    let msg = "Évszakból hátralévő idő: "
+    let time = 7 - (actualDate % 7)
+    timeLeftSpan.innerText = (msg + time)
+}
+
+function passTime(timeToPass){
+    actualDate += timeToPass
+    displayActualTime()
+}
+
+function mirrorActualElementShape(){
+    console.log("mirror")
+
+    let shape = actualElement.shape
+    let mirroredShape = []
+    
+    for(let i = 0; i < elementSize; ++i){
+        mirroredShape.push(shape[i].reverse())
+    }
+    
+    actualElement.shape = mirroredShape
+    
+    clearTable(actElementBoard)
+    drawActualElement(actualElement, actElementBoard)
+}
+
+function rotateActualElementShape(){
+    console.log("rotate")
+
+    let shape = actualElement.shape
+    let rotatedShape = [[],[],[]]
+
+    for(let i = 0; i < elementSize; ++i){
+        for(let j = elementSize-1; j > -1; --j){
+            rotatedShape[i].push(shape[j][i])
+        }
+    }
+
+    console.table(rotatedShape)
+
+    actualElement.shape = rotatedShape
+
+    clearTable(actElementBoard)
+    drawActualElement(actualElement, actElementBoard)
+}
 
 function rerollActualElement(){
     actualElement = getActualElement()
@@ -35,7 +93,7 @@ function placeElement(event){
     let elementType = actualElement.type;
     
     if(!alignmentGood){
-        //Kell valahogy jelezni  faszparaszt
+        //Kell valahogy jelezni faszparaszt
         console.log("Nope, wrong placement")
     }else{
         for(let i = 0; i < elementSize; ++i){
@@ -50,6 +108,7 @@ function placeElement(event){
                 }
             }
         }
+        passTime(actualElement.time);
         rerollActualElement();
         clearTable(actElementBoard)
         drawActualElement(actualElement, actElementBoard)
