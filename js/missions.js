@@ -54,19 +54,53 @@ const missions =
 	],
 }
 
-let treesOnEdge = 0;
+let challengesPoints = [0, 0, 0, 0]
 
 //should rework so it only runs end of seasons
 function runChallengeCheck() {
-	let sum = 0;
+	let count = 0;
+	let toCheck = seasons[lastSeason];
 
-	sum += edgeOfTheForest()
+	console.log(toCheck)
 
-	updatePoints(sum)
+	for (let i = 0; i < toCheck.length; ++i) {
+		index = toCheck[i]
+		switch (actualChallenges[index]["title"]) {
+			case "Az erdő széle":
+				count += edgeOfTheForest();
+				challengesPoints[index] = treesOnEdge;
+				console.log("Az erdő széle "+index+" "+treesOnEdge)
+				break;
+			case "Álmos-völgy":
+				console.log("Álmos-völgy "+index)
+				count += sleepyValley();
+				challengesPoints[index] = threeForestRows;
+				console.log("Álmos-völgy "+index+" "+threeForestRows)
+				break;
+			case "Krumpliöntözés":
+				count += potatoWatering();
+				challengesPoints[index] = wateredPotatos;
+				console.log("Krumpliöntözés "+index+" "+wateredPotatos)
+				break;
+			case "Határvidék":
+				count += borderLand();
+				challengesPoints[index] = fullRowsOrColumns;
+				console.log("Határvidék "+index+" "+fullRowsOrColumns)
+				break;
+			default:
+				break;
+		}
+	}
+
+	updateChallenges(challengesTable, challengesPoints)
+	updatePoints(count)
 }
 
+//------------------ edge of the forest ---------------------------//
+let treesOnEdge = 0;
+
 function edgeOfTheForest() {
-	let sum = 0;
+	let count = 0;
 	let edgetds = 0;
 	for (let i = 0; i < boardSize; ++i) {
 		for (let j = 0; j < boardSize; ++j) {
@@ -76,20 +110,154 @@ function edgeOfTheForest() {
 			}
 
 			td = board.rows[i].cells[j];
-			edgetds+=1;
+			edgetds += 1;
 			if (td.getAttribute("class") === 'forest') {
-				sum += 1;
+				count += 1;
 			}
 		}
 	}
-	console.log(edgetds)
 
 	let extraPoints = 0;
 
-	if(sum > treesOnEdge){
-		extraPoints = sum - treesOnEdge
-		treesOnEdge = sum
+	if (count > treesOnEdge) {
+		extraPoints = count - treesOnEdge
+		treesOnEdge = count
 	}
-	
+
+	return extraPoints;
+}
+
+//------------------ borderland------------------------------------//
+let fullRowsOrColumns = 0;
+
+function borderLand() {
+	count = 0;
+	for (let row = 0; row < boardSize; ++row) {
+		for (let col = 0; col < boardSize; ++col) {
+
+			td = board.rows[row].cells[col];
+
+			//skip to next row
+			if (td.getAttribute("class") === null) {
+				break;
+			}
+
+			if (col === boardSize - 1) {
+				count += 6;
+			}
+		}
+	}
+
+	for (let col = 0; col < boardSize; ++col) {
+		for (let row = 0; row < boardSize; ++row) {
+
+			td = board.rows[row].cells[col];
+
+			//skip to next col
+			if (td.getAttribute("class") === null) {
+				break;
+			}
+
+			if (row === boardSize - 1) {
+				count += 6;
+			}
+		}
+	}
+
+	let extraPoints = 0;
+
+	if (count > fullRowsOrColumns) {
+		extraPoints = count - fullRowsOrColumns
+		fullRowsOrColumns = count
+	}
+
+	return extraPoints;
+}
+
+//------------------ potato watering ------------------------------//
+let wateredPotatos = 0;
+
+function potatoWatering() {
+	let count = 0;
+
+	for (let row = 0; row < boardSize; ++row) {
+		for (let col = 0; col < boardSize; ++col) {
+
+			td = board.rows[row].cells[col];
+
+			//skip to next row
+			if (td.getAttribute("class") === 'farm') {
+				count += (countNeighbours(row, col, 'water') * 2);
+			}
+		}
+	}
+
+	let extraPoints = 0;
+
+	if (count > wateredPotatos) {
+		extraPoints = count - wateredPotatos
+		wateredPotatos = count
+	}
+
+	return extraPoints;
+}
+
+function countNeighbours(row, col, type) {
+	let count = 0;
+
+	if (row - 1 > -1) {
+		if (board.rows[row - 1].cells[col].getAttribute("class") === type) {
+			++count;
+		}
+	}
+	if (col - 1 > -1) {
+		if (board.rows[row].cells[col - 1].getAttribute("class") === type) {
+			++count;
+		}
+	}
+	if (row + 1 < 11) {
+		if (board.rows[row + 1].cells[col].getAttribute("class") === type) {
+			++count;
+		}
+	}
+	if (col + 1 < 11) {
+		if (board.rows[row].cells[col + 1].getAttribute("class") === type) {
+			++count;
+		}
+	}
+
+	return count;
+}
+
+//------------------ sleepy valley --------------------------------//
+let threeForestRows = 0;
+
+function sleepyValley(){
+	count = 0;
+	let forestCount;
+	for (let row = 0; row < boardSize; ++row) {
+		forestCount = 0;
+		for (let col = 0; col < boardSize; ++col) {
+
+			td = board.rows[row].cells[col];
+
+			if (td.getAttribute("class") === 'forest') {
+				++forestCount;
+				// console.log("found forest: "+row+":"+col)
+			}
+		}
+		if(forestCount === 3){
+			count += 4;
+			// console.log("found row: "+row)
+		}
+	}
+
+	let extraPoints = 0;
+
+	if (count > threeForestRows) {
+		extraPoints = count - threeForestRows
+		threeForestRows = count
+	}
+
 	return extraPoints;
 }

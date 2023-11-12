@@ -1,5 +1,11 @@
 //hegyek:
 //(sor, oszlop) => (2,2), (4,9), (6,4), (9,10), (10,6)
+const seasons = {
+    "spring":[0,1],
+    "summer":[1,2],
+    "autumn":[2,3],
+    "winter":[0,3]
+}
 
 //---------------------------main----------------------------------
 const board = document.querySelector("#gameboard")
@@ -27,7 +33,8 @@ let gameOver = false;
 
 let actualElement;
 let actualDate = 0;
-let actualSeason = "";
+let actualSeason = "spring";
+let lastSeason = "";
 
 let actualChallenges = []
 
@@ -44,123 +51,196 @@ drawActualElement(actualElement, actElementBoard)
 setActualElementTime(actualElement.time, actElementTimeSpan)
 displayActualTime()
 generateTable(2, challengesTable)
-//rollChallenges()
+rollChallenges()
 displayChallenges(challengesTable)
 
-if(!gameOver){
-    delegate(board, "mouseover", "td", mouseHoverEnter)
-    delegate(board, "mouseout", "td", mouseHoverLeave)
+delegate(board, "mouseover", "td", mouseHoverEnter)
+delegate(board, "mouseout", "td", mouseHoverLeave)
 
-    delegate(board, "click", "td", placeElement)
+delegate(board, "click", "td", placeElement)
 
-    delegate(rotateButton, "click", "button", rotateActualElementShape)
-    delegate(mirrorButton, "click", "button", mirrorActualElementShape)
-}
+delegate(rotateButton, "click", "button", rotateActualElementShape)
+delegate(mirrorButton, "click", "button", mirrorActualElementShape)
 
 
 //---------------------------functions--------------------------------
 
-function displayActualSeason(){
+function updateGame() {
+    passTime(actualElement.time);
+    updateSeason();
+    rerollActualElement();
+    clearTable(actElementBoard);
+    drawActualElement(actualElement, actElementBoard);
+    setActualElementTime(actualElement.time, actElementTimeSpan);
+}
+
+function seasonChange() {
+    runChallengeCheck();
+}
+
+function gameOverEvent() {
+    //display none for somethings
+}
+
+function rollChallenges() {
+    let max = missions["basic"].length
+    let chosen = []
+
+    for (let i = 0; i < challengesCount; ++i) {
+        let random;
+        do {
+            random = getRandomInteger(max);
+        } while (chosen.includes(random))
+        chosen.push(random)
+    }
+
+    for (let i = 0; i < challengesCount; ++i) {
+        actualChallenges.push(missions["basic"][chosen[i]]);
+    }
+}
+
+function displayActualSeason() {
     // console.log("season: "+actualSeason)
-    switch(actualSeason){
+    switch (actualSeason) {
         case "spring":
-            actualSeasonParagraph.innerText = "Jelenlegi évszak: Tavasz (A B)"
+            actualSeasonParagraph.innerText = "Jelenlegi évszak: Tavasz (A B)";
             break;
         case "summer":
-            actualSeasonParagraph.innerText = "Jelenlegi évszak: Nyár (B C)"
+            actualSeasonParagraph.innerText = "Jelenlegi évszak: Nyár (B C)";
             break;
         case "autumn":
-            actualSeasonParagraph.innerText = "Jelenlegi évszak: Ősz (C D)"
+            actualSeasonParagraph.innerText = "Jelenlegi évszak: Ősz (C D)";
             break;
         case "winter":
-            actualSeasonParagraph.innerText = "Jelenlegi évszak: Tél (A D)"
+            actualSeasonParagraph.innerText = "Jelenlegi évszak: Tél (A D)";
             break;
         default:
     }
 }
 
 function updateSeason() {
-    let actSeasonNumber = Math.floor(actualDate / seasonLength)
-    // console.log("season num: "+actSeasonNumber)
-    switch(actSeasonNumber){
+    let actSeasonNumber = Math.floor(actualDate / seasonLength);
+    let prevSeason = actualSeason;
+    switch (actSeasonNumber) {
         case 0:
-            actualSeason = "spring"
+            actualSeason = "spring";
             break;
         case 1:
-            actualSeason = "summer"
+            actualSeason = "summer";
             break;
         case 2:
-            actualSeason = "autumn"
+            actualSeason = "autumn";
             break;
         case 3:
-            actualSeason = "winter"
+            actualSeason = "winter";
             break;
         default:
+            actualSeason = "spring"
     }
+
+    if (prevSeason !== actualSeason) {
+        lastSeason = prevSeason
+        seasonChange()
+    }
+
     displayActualSeason()
 }
 
 function updatePoints(pointsToAdd) {
-    switch(actualSeason){
-        case "spring":
-            springPoints += pointsToAdd
-            break;
+    switch (actualSeason) {
         case "summer":
-            summerPoints += pointsToAdd
+            springPoints += pointsToAdd;
             break;
         case "autumn":
-            autumnPoints += pointsToAdd
+            summerPoints += pointsToAdd;
             break;
         case "winter":
-            winterPoints += pointsToAdd
+            autumnPoints += pointsToAdd;
+            break;
+        case "spring":
+            winterPoints += pointsToAdd;
             break;
         default:
     }
-    springPointsSpan.innerText = ""+springPoints+" pont"
-    summerPointsSpan.innerText = ""+summerPoints+" pont"
-    autumnPointsSpan.innerText = ""+autumnPoints+" pont"
-    winterPointsSpan.innerText = ""+winterPoints+" pont"
-    let sum = springPoints + summerPoints + autumnPoints + winterPoints
-    summedPointsParagraph.innerText = "Összpontszám: "+sum+" pont"
-    
+    springPointsSpan.innerText = "" + springPoints + " pont";
+    summerPointsSpan.innerText = "" + summerPoints + " pont";
+    autumnPointsSpan.innerText = "" + autumnPoints + " pont";
+    winterPointsSpan.innerText = "" + winterPoints + " pont";
+    let sum = springPoints + summerPoints + autumnPoints + winterPoints;
+    summedPointsParagraph.innerText = "Összpontszám: " + sum + " pont";
+
+}
+
+function updateChallenges(table, points){
+    let toHighlight = seasons[actualSeason];
+
+    // console.log(toHighlight)
+    console.log(points)
+
+    for (let i = 0; i < challengesCount; ++i) {
+        
+        actMission = actualChallenges[i];
+        
+        td = table.rows[Math.floor(i / 2)].cells[i % 2];
+        td.style.backgroundColor = null;
+        
+        td.innerHTML = "<h3>" + actMission["title"] + "</h3>" + actMission["description"];
+        td.innerHTML += "<br><br>Küldetés: " + String.fromCharCode(65 + i)+" <span>("+points[i]+" pont)</span>";
+        
+        if(i === toHighlight[0] || i === toHighlight[1]){
+            td.style.backgroundColor = "rgb(120,255,120)";
+        }
+    }
 }
 
 function displayChallenges(table) {
+    let toHighlight = seasons[actualSeason];
+    
+    // console.log(toHighlight)
+    
     for (let i = 0; i < challengesCount; ++i) {
-        actMission = missions["basic"][i]
-        td = table.rows[Math.floor(i / 2)].cells[i % 2]
-        td.innerHTML = "<h3>" + actMission["title"] + "</h3>" + actMission["description"]
-        td.innerHTML += "<br><br>Küldetés: " + String.fromCharCode(65 + i)
+        
+        actMission = actualChallenges[i];
+        
+        td = table.rows[Math.floor(i / 2)].cells[i % 2];
+        
+        td.innerHTML = "<h3>" + actMission["title"] + "</h3>" + actMission["description"];
+        td.innerHTML += "<br><br>Küldetés: " + String.fromCharCode(65 + i)+" <span>(0 pont)</span>";
+        
+        if(i === toHighlight[0] || i === toHighlight[1]){
+            td.style.backgroundColor = "rgb(120,255,120)";
+        }
     }
 }
 
 function displayActualTime() {
-    let msg = "Évszakból hátralévő idő: "
-    let time = seasonLength - (actualDate % seasonLength)
-    timeLeftText.innerText = (msg + time)
+    let msg = "Évszakból hátralévő idő: ";
+    let time = seasonLength - (actualDate % seasonLength);
+    timeLeftText.innerText = (msg + time);
 }
 
 function passTime(timeToPass) {
-    actualDate += timeToPass
-    displayActualTime()
-    if(actualDate >= yearLength){
-        gameOver = true
+    actualDate += timeToPass;
+    displayActualTime();
+    if (actualDate >= yearLength) {
+        gameOver = true;
+        gameOverEvent();
     }
 }
 
 function mirrorActualElementShape() {
 
-    let shape = actualElement.shape
-    let mirroredShape = []
+    let shape = actualElement.shape;
+    let mirroredShape = [];
 
     for (let i = 0; i < elementSize; ++i) {
         mirroredShape.push(shape[i].reverse())
     }
 
-    actualElement.shape = mirroredShape
+    actualElement.shape = mirroredShape;
 
-    clearTable(actElementBoard)
-    drawActualElement(actualElement, actElementBoard)
+    clearTable(actElementBoard);
+    drawActualElement(actualElement, actElementBoard);
 }
 
 function rotateActualElementShape() {
@@ -208,13 +288,7 @@ function placeElement(event) {
                 }
             }
         }
-        passTime(actualElement.time);
-        updateSeason();
-        rerollActualElement();
-        clearTable(actElementBoard);
-        drawActualElement(actualElement, actElementBoard);
-        setActualElementTime(actualElement.time, actElementTimeSpan);
-        runChallengeCheck();
+        updateGame();
     }
 }
 
@@ -238,7 +312,7 @@ function canPlaceElement(cIndex, rIndex) {
 
             td = board.rows[rIndex - 1 + i].cells[cIndex - 1 + j]
 
-            if (td.getAttribute("class") != null && elementShape[i][j]) {
+            if (td.getAttribute("class") !== null && elementShape[i][j]) {
                 // console.log("van classja ennek a td-nek:"+ (rIndex-1+i) +":"+ (cIndex-1+j))
                 placable = false;
             }
@@ -255,9 +329,9 @@ function mouseHoverEnter(event) {
     cellI = this.cellIndex
     rowI = this.closest('tr').rowIndex
 
-    if(!canPlaceElement(cellI, rowI)){
+    if (!canPlaceElement(cellI, rowI)) {
         color = "rgb(255,120,120)"
-    }else{
+    } else {
         color = "rgb(120,255,120)"
     }
 
@@ -319,7 +393,7 @@ function getActualElement() {
 }
 
 function setActualElementTime(timeToSet, span) {
-    if(gameOver){
+    if (gameOver) {
         span.innerText = "";
         return;
     }
@@ -330,7 +404,7 @@ function setActualElementTime(timeToSet, span) {
 
 //draws to act-element board (might rework for all purpose later)
 function drawActualElement(elementToDraw, targetTable) {
-    if(gameOver){
+    if (gameOver) {
         return;
     }
     elementShape = elementToDraw.shape
