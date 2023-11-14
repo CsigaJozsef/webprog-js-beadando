@@ -1,6 +1,6 @@
 const missions =
 {
-	"basic": [
+	"completed": [
 		{
 			"title": "Az erdő széle",
 			"description": "A térképed szélével szomszédos erdőmezőidért egy-egy pontot kapsz."
@@ -18,7 +18,7 @@ const missions =
 			"description": "Minden teli sorért vagy oszlopért 6-6 pontot kapsz."
 		}
 	],
-	"extra": [
+	"notcompleted": [
 		{
 			"title": "Fasor",
 			"description": "A leghosszabb, függőlegesen megszakítás nélkül egybefüggő erdőmezők mindegyikéért kettő-kettő pontot kapsz. Két azonos hosszúságú esetén csak az egyikért."
@@ -56,7 +56,6 @@ const missions =
 
 let challengesPoints = [0, 0, 0, 0]
 
-//should rework so it only runs end of seasons
 function runChallengeCheck() {
 	let count = 0;
 	let toCheck = seasons[lastSeason];
@@ -69,32 +68,149 @@ function runChallengeCheck() {
 			case "Az erdő széle":
 				count += edgeOfTheForest();
 				challengesPoints[index] = treesOnEdge;
-				console.log("Az erdő széle "+index+" "+treesOnEdge)
+				console.log("Az erdő széle " + index + " " + treesOnEdge)
 				break;
 			case "Álmos-völgy":
-				console.log("Álmos-völgy "+index)
+				console.log("Álmos-völgy " + index)
 				count += sleepyValley();
 				challengesPoints[index] = threeForestRows;
-				console.log("Álmos-völgy "+index+" "+threeForestRows)
+				console.log("Álmos-völgy " + index + " " + threeForestRows)
 				break;
 			case "Krumpliöntözés":
 				count += potatoWatering();
 				challengesPoints[index] = wateredPotatos;
-				console.log("Krumpliöntözés "+index+" "+wateredPotatos)
+				console.log("Krumpliöntözés " + index + " " + wateredPotatos)
 				break;
 			case "Határvidék":
 				count += borderLand();
 				challengesPoints[index] = fullRowsOrColumns;
-				console.log("Határvidék "+index+" "+fullRowsOrColumns)
+				console.log("Határvidék " + index + " " + fullRowsOrColumns)
 				break;
+			case "Fasor":
+				count += countLongestWoods();
+				challengesPoints[index] = longestWoodsPoints;
+				console.log("Fasor " + index + " " + longestWoodsPoints)
 			default:
 				break;
 		}
 	}
 
+	count += countSurroundedMountains()
+
 	updateChallenges(challengesTable, challengesPoints)
 	updatePoints(count)
 }
+
+//------------------ longest woods --------------------------------//
+let longestWoodsPoints = 0;
+
+function countLongestWoods() {
+
+	let longest = 0;
+
+	for (let row = 0; row < boardSize; ++row) {
+
+		let count = 0;
+		let inWoods = false;
+
+		for (let col = 0; col < boardSize; ++col) {
+
+			td = board.rows[row].cells[col];
+
+			if (td.getAttribute("class") === "forest") {
+
+				count += 1;
+				inWoods = true;
+
+			} else if (td.getAttribute("class") !== "forest" && inWoods) {
+
+				console.log("Vége az erdőnek: " + count)
+
+				if (longest < count) {
+					longest = count;
+				}
+
+				inWoods = false;
+				count = 0;
+			}
+		}
+
+		console.log("Vége az erdőnek: " + count)
+
+		if (count > 0 && longest < count) {
+			longest = count;
+		}
+	}
+
+	let points = longest * 2;
+
+	let extraPoints = 0;
+
+	if (points > longestWoodsPoints) {
+		extraPoints = points - longestWoodsPoints
+		longestWoodsPoints = points
+	}
+
+	return extraPoints;
+}
+
+//------------------ surrounded mountains -------------------------//
+let surroundedMountains = 0;
+
+function cellExists(x, y) {
+	let l = true;
+	if (x < 0 || x > 10 || y > 10 || y < 0) {
+		l = false;
+	}
+	return l;
+}
+
+function isSurrounded(x, y) {
+	let l = true;
+	let actX;
+	let actY;
+	for (let i = 0; i < 8; ++i) {
+		if (i < 3) {
+			actX = x - 1
+			actY = y + 1 - i
+		} else if (i >= 3 && i <= 4) {
+			actX = x
+			i === 3 ? actY = y - 1 : actY = y + 1
+		} else {
+			actX = x + 1
+			actY = y + 6 - i
+		}
+
+		if (cellExists(actX, actY)) {
+			let td = board.rows[actX].cells[actY]
+			if (td.getAttribute("class") === null) {
+				l = false;
+			}
+		}
+	}
+
+	return l
+}
+
+function countSurroundedMountains() {
+	let count = 0;
+
+	mountains.forEach((mountain) => {
+		if (isSurrounded(mountain["x"], mountain["y"])) {
+			count += 1;
+		}
+	})
+
+	let extraPoints = 0;
+
+	if (count > surroundedMountains) {
+		extraPoints = count - surroundedMountains
+		surroundedMountains = count
+	}
+
+	return extraPoints;
+}
+
 
 //------------------ edge of the forest ---------------------------//
 let treesOnEdge = 0;
@@ -232,7 +348,7 @@ function countNeighbours(row, col, type) {
 //------------------ sleepy valley --------------------------------//
 let threeForestRows = 0;
 
-function sleepyValley(){
+function sleepyValley() {
 	count = 0;
 	let forestCount;
 	for (let row = 0; row < boardSize; ++row) {
@@ -246,7 +362,7 @@ function sleepyValley(){
 				// console.log("found forest: "+row+":"+col)
 			}
 		}
-		if(forestCount === 3){
+		if (forestCount === 3) {
 			count += 4;
 			// console.log("found row: "+row)
 		}

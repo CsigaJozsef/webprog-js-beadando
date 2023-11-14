@@ -28,12 +28,12 @@ A fegyelmi vétség legsúlyosabb következménye a hallgató elbocsátása az e
 [x] Küldetés: a "Krumpliöntözés" küldetés megjelenik és pontszámát ki tudja számolni. (1 pont)<br />
 [x] Évszak: A játék 4 évszakon keresztül tart, minden évszak 7 időegységig tart, az évszakokhoz tartozó küldetéskártyák kiemelődnek. (1 pont)<br />
 [x] Évszak: Minden évszak végén kiszámolódik a hozzájuk tartozó küldetésekből az évszak végi pontszám, és a játék folytatódik a következő évszakra. (1 pont)<br />
-[ ] Küldetés: A hegyek teljes bekerítésével 1 plusz pont szerezhető, amelyek minden évszak (vagy a játék) végén hozzáadódnak a pontszámunkhoz (1 pont)<br />
+[x] Küldetés: A hegyek teljes bekerítésével 1 plusz pont szerezhető, amelyek minden évszak (vagy a játék) végén hozzáadódnak a pontszámunkhoz (1 pont)<br />
 [x] Játék vége: A játék végén megjelenik a négy évszak alatt szerzett összpontszám (1 pont)<br />
 [x] Igényes megjelenés (1 pont)
 
 ### Extrák (10 pont)
-[ ] Küldetés: Fasor (1 pont)<br />
+[x] Küldetés: Fasor (1 pont)<br />
 [ ] Küldetés: Öntözőcsatorna (1 pont)<br />
 [ ] Küldetés: Gazdag város (1 pont)<br />
 [ ] Küldetés: Mágusokvölgye (1 pont)<br />

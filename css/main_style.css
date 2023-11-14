@@ -1,34 +1,47 @@
-html{
-    /* background: url('../img/frog_regular.png') no-repeat center center fixed;  */
-    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
-                  url("../img/potato.jpg");
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
+body {
+    background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
+        url("../img/burgony.jpg");
     background-size: cover;
-}
-
-body{
     font-family: 'Courier New', Courier, monospace;
     font-size: 1.5rem;
 }
 
-button{
+h1 {
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgb(80, 80, 80);
+    border-radius: 10px;
+}
+
+hr {
+    border: 3px solid;
+    border-color: beige;
+    border-radius: 10px;
+}
+
+p {
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgb(80, 80, 80);
+    border-radius: 10px;
+    text-align: center;
+}
+
+button {
     font-size: 1.6rem;
 }
 
-/* @media all and (min-width: 1080px){
-    body{
-        overflow: hidden;
-    }
-} */
+a button {
+    width: 100%;
+}
 
-table{
+table {
+    border-radius: 10px;
     margin-left: auto;
     margin-right: auto;
 }
 
-table, th, td {
+table,
+th,
+td {
     border-spacing: 0.3rem;
 }
 
@@ -41,69 +54,70 @@ td {
     background-color: beige;
 }
 
-h1{
+h1 {
     font-size: 4rem;
     margin: 0.2rem 1rem;
 }
 
-#seasons-table{
+#seasons-table {
     table-layout: fixed;
-    width: 75%;
+    width: 100%;
 }
 
-#challenges{
+#challenges {
     width: 100%;
     table-layout: fixed;
     border-spacing: 0.5rem;
 }
 
-#challenges td{
-    height: 4rem;
+#challenges td {
+    vertical-align: top;
     padding: 0 10px;
     font-size: 0.95rem;
 }
 
-.main-div{
+.main-div {
     display: flex;
     flex-direction: row;
 }
 
-.first-col-div{
+.first-col-div {
     width: 50%;
     /* height: 100vh; */
     text-align: center;
 }
 
-.second-col-div{
+.second-col-div {
     width: 50%;
     /* height: 100vh; */
     padding: 0.8rem;
 }
 
-.hover{
-    background-color: gray;
-}
-
-.mountain{
+.mountain {
     background-color: #b37a4f;
+    background-image: url("../img/mountain.png");
 }
 
-.farm{
+.farm {
     background-color: #ffff52;
+    background-image: url("../img/farm.png");
 }
 
-.forest{
+.forest {
     background-color: #3b7c48;
+    background-image: url("../img/forest.png");
 }
 
-.water{
+.water {
     background-color: #5787bf;
+    background-image: url("../img/water.png");
 }
 
-.town{
+.town {
     background-color: #b75353;
+    background-image: url("../img/city.png");
 }
 
-.element-time-text{
+.element-time-text {
     font-size: 2rem;
 }

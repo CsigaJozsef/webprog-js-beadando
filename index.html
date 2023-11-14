@@ -1,67 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main_style.css">
     <title>A térképész</title>
 </head>
+
 <body>
     <div class="main-div">
-        
+
         <div class="first-col-div">
-            
+
             <h1>Burgonya térkép</h1>
 
             <table id="gameboard">
             </table>
-        
+
         </div>
 
         <div class="second-col-div">
-            
+
             <table id="seasons-table">
                 <tr>
-                    <td>Tavasz:<br><span id="spring-points-span">0 pont</span></td>
-                    <td>Nyár:<br><span id="summer-points-span">0 pont</span></td>
-                    <td>Ősz:<br><span id="autumn-points-span">0 pont</span></td>
-                    <td>Tél:<br><span id="winter-points-span">0 pont</span></td>
+                    <td id="spring-td">Tavasz:<br><span id="spring-points-span">0 pont</span></td>
+                    <td id="summer-td">Nyár:<br><span id="summer-points-span">0 pont</span></td>
+                    <td id="autumn-td">Ősz:<br><span id="autumn-points-span">0 pont</span></td>
+                    <td id="winter-td">Tél:<br><span id="winter-points-span">0 pont</span></td>
                 </tr>
             </table>
             <p id="summed-points-paragraph">Összpontszám: 0 pont</p>
-            <a href="index.html" style="display: none;"><button>Új játék</button></a>
-            <p id="actual-season-paragraph">Jelenlegi évszak: Tavasz (A B)</p>
-            
-            <hr>
-            
-            <table id="challenges"></table>
-            <p id="time-left-paragraph"></p>
-            
-            <hr>
-            
-            <div class="main-div" id="element-div">
+            <a href="index.html" id="new-game-button" style="display: none;"><button>Új játék</button></a>
 
-                <div class="first-col-div">
+            <div id="challenges-div">
 
-                    <p>Aktuális elem:</p>
-                    <button id="rotate-element">Forgatás</button>
-                    <button id="mirror-element">Tükrözés</button>
-                    <span id="act-element-time"></span>
+                <p id="actual-season-paragraph">Jelenlegi évszak: Tavasz (A B)</p>
 
+                <hr>
+
+                <table id="challenges"></table>
+                <p id="time-left-paragraph"></p>
+
+            </div>
+
+            <div id="element-div">
+                <hr>
+                <div class="main-div">
+
+
+                    <div class="first-col-div">
+
+                        <p>Aktuális elem:</p>
+                        <button id="rotate-element">Forgatás</button>
+                        <button id="mirror-element">Tükrözés</button>
+                        <span id="act-element-time"></span>
+
+                    </div>
+
+                    <div class="second-col-div">
+
+                        <table id="act-element-board"></table>
+
+                    </div>
                 </div>
-                
-                <div class="second-col-div">
-        
-                    <table id="act-element-board"></table>
-
-                </div>
-            </div>    
+            </div>
         </div>
     </div>
-    
+
     <script src="js/missions.js"></script>
     <script src="js/elements.js"></script>
     <script src="js/mountains.js"></script>
     <script src="js/script.js"></script>
 </body>
+
 </html>
