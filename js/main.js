@@ -4,7 +4,8 @@ const seasons = {
     "spring": [0, 1],
     "summer": [1, 2],
     "autumn": [2, 3],
-    "winter": [0, 3]
+    "winter": [0, 3],
+    "gamestop": [0, 0]
 }
 
 //---------------------------main----------------------------------
@@ -80,10 +81,12 @@ function iterateActualElement() {
 function updateGame() {
     passTime(actualElement.time);
     updateSeason();
-    iterateActualElement();
-    clearTable(actElementBoard);
-    drawActualElement(actualElement, actElementBoard);
-    setActualElementTime(actualElement.time, actElementTimeSpan);
+    if (actualSeason !== "gamestop") {
+        iterateActualElement();
+        clearTable(actElementBoard);
+        drawActualElement(actualElement, actElementBoard);
+        setActualElementTime(actualElement.time, actElementTimeSpan);
+    }
 }
 
 function seasonChange() {
@@ -109,10 +112,15 @@ function rollChallenges() {
     let chosen = []
 
     for (let i = 0; i < challengesCount; ++i) {
+        
         let random;
+        
         do {
+        
             random = getRandomInteger(max);
+        
         } while (chosen.includes(random))
+        
         chosen.push(random)
     }
 
@@ -182,6 +190,9 @@ function displayActualSeason() {
 
             break;
         default:
+            setPageBackground(0.1, 0.1, "img/burgony.jpg")
+            setBackgroundColorOfArray(allParagraphs, "rgba(250, 250, 250, 0.8)")
+            break;
     }
 }
 
@@ -202,7 +213,8 @@ function updateSeason() {
             actualSeason = "winter";
             break;
         default:
-            actualSeason = "spring"
+            actualSeason = "gamestop"
+            break;
     }
 
     if (prevSeason !== actualSeason) {
@@ -228,6 +240,7 @@ function updatePoints(pointsToAdd) {
             winterPoints += pointsToAdd;
             break;
         default:
+            break;
     }
     springPointsSpan.innerText = "" + springPoints + " pont";
     summerPointsSpan.innerText = "" + summerPoints + " pont";
@@ -263,8 +276,6 @@ function updateChallenges(table, points) {
 function displayChallenges(table) {
     let toHighlight = seasons[actualSeason];
 
-    // console.log(toHighlight)
-
     for (let i = 0; i < challengesCount; ++i) {
 
         actMission = actualChallenges[i];
@@ -281,14 +292,18 @@ function displayChallenges(table) {
 }
 
 function displayActualTime() {
+
     let msg = "Évszakból hátralévő idő: ";
     let time = actualDate % seasonLength;
+    
     timeLeftText.innerText = (msg + time + "/7");
 }
 
 function passTime(timeToPass) {
+    
     actualDate += timeToPass;
     displayActualTime();
+    
     if (actualDate >= yearLength) {
         gameOver = true;
         gameOverEvent();
@@ -411,12 +426,19 @@ function canPlaceElement(cIndex, rIndex) {
 }
 
 function mouseHoverEnterEventHandler(event) {
+    if(actualElement === undefined){
+        return;
+    }
     cellI = this.cellIndex
     rowI = this.closest('tr').rowIndex
     mouseHoverEnter(cellI, rowI);
 }
 
 function mouseHoverEnter(cellI, rowI) {
+
+    if(actualSeason === "gamestop"){
+        return;
+    }
 
     elementShape = actualElement.shape
 
@@ -445,12 +467,19 @@ function mouseHoverEnter(cellI, rowI) {
 }
 
 function mouseHoverLeaveEventHandler(event) {
+    if(actualElement === undefined){
+        return;
+    }
     cellI = this.cellIndex
     rowI = this.closest('tr').rowIndex
     mouseHoverLeave(cellI, rowI);
 }
 
 function mouseHoverLeave(cellI, rowI) {
+
+    if(actualSeason === "gamestop"){
+        return;
+    }
 
     for (let i = 0; i < elementSize; ++i) {
         for (let j = 0; j < elementSize; ++j) {
