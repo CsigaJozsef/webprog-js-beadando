@@ -39,9 +39,7 @@ table {
     margin-right: auto;
 }
 
-table,
-th,
-td {
+table, th, td {
     border-spacing: 0.3rem;
 }
 
@@ -64,13 +62,13 @@ h1 {
     width: 100%;
 }
 
-#challenges {
+#missions {
     width: 100%;
     table-layout: fixed;
     border-spacing: 0.5rem;
 }
 
-#challenges td {
+#missions td {
     vertical-align: top;
     padding: 0 10px;
     font-size: 0.95rem;

@@ -23,9 +23,10 @@ const mountains = [
 
 //places predetermined constant mountains on gameboard
 function placeMountains() {
+    let td;
 
     mountains.forEach(m => {
-        td = board.rows[m.x].cells[m.y];
+        td = getTableElement(board, m.y, m.x)
         td.setAttribute("class", "mountain");
     })
 }

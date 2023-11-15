@@ -54,13 +54,13 @@ const missions =
 	],
 }
 
-let challengesPoints = [0, 0, 0, 0]
+let missionsPoints = [0, 0, 0, 0]
 
-function rollChallenges() {
+function rollMissions() {
     let max = missions["completed"].length
     let chosen = []
 
-    for (let i = 0; i < challengesCount; ++i) {
+    for (let i = 0; i < missionsCount; ++i) {
 
         let random;
 
@@ -73,54 +73,58 @@ function rollChallenges() {
         chosen.push(random)
     }
 
-    for (let i = 0; i < challengesCount; ++i) {
-        actualChallenges.push(missions["completed"][chosen[i]]);
+    for (let i = 0; i < missionsCount; ++i) {
+        actualMissions.push(missions["completed"][chosen[i]]);
     }
 }
 
-function runChallengeCheck() {
+function runMissionsCheck() {
 	let count = 0;
 	let toCheck = seasons[lastSeason];
 
-	console.log(toCheck)
-
 	for (let i = 0; i < toCheck.length; ++i) {
 		index = toCheck[i]
-		switch (actualChallenges[index]["title"]) {
+		switch (actualMissions[index]["title"]) {
 			case "Az erdő széle":
 				count += edgeOfTheForest();
-				challengesPoints[index] = treesOnEdge;
-				console.log("Az erdő széle " + index + " " + treesOnEdge)
+				missionsPoints[index] = treesOnEdge;
 				break;
 			case "Álmos-völgy":
-				console.log("Álmos-völgy " + index)
 				count += sleepyValley();
-				challengesPoints[index] = threeForestRows;
-				console.log("Álmos-völgy " + index + " " + threeForestRows)
+				missionsPoints[index] = threeForestRows;
 				break;
 			case "Krumpliöntözés":
 				count += potatoWatering();
-				challengesPoints[index] = wateredPotatos;
-				console.log("Krumpliöntözés " + index + " " + wateredPotatos)
+				missionsPoints[index] = wateredPotatos;
 				break;
 			case "Határvidék":
 				count += borderLand();
-				challengesPoints[index] = fullRowsOrColumns;
-				console.log("Határvidék " + index + " " + fullRowsOrColumns)
+				missionsPoints[index] = fullRowsOrColumns;
 				break;
 			case "Fasor":
 				count += countLongestWoods();
-				challengesPoints[index] = longestWoodsPoints;
-				console.log("Fasor " + index + " " + longestWoodsPoints)
+				missionsPoints[index] = longestWoodsPoints;
 			default:
 				break;
 		}
 	}
 
+	console.log(missionsPoints)
+
 	count += countSurroundedMountains()
 
-	updateChallenges(challengesTable, challengesPoints)
+	displayMissions(missionsTable, missionsPoints)
 	updatePoints(count)
+}
+
+function countExtraPoints(actualPoints, storedPoints){
+	let extraPoints = 0;
+
+	if (actualPoints > storedPoints) {
+		extraPoints = actualPoints - storedPoints
+	}
+
+	return extraPoints;
 }
 
 //------------------ longest woods --------------------------------//
@@ -137,11 +141,11 @@ function countLongestWoods() {
 
 		for (let col = 0; col < boardSize; ++col) {
 
-			td = board.rows[row].cells[col];
+			let td = getTableElement(board, col, row)
 
 			if (td.getAttribute("class") === "forest") {
 
-				count += 1;
+				count += 2;
 				inWoods = true;
 
 			} else if (td.getAttribute("class") !== "forest" && inWoods) {
@@ -160,16 +164,10 @@ function countLongestWoods() {
 		}
 	}
 
-	let points = longest * 2;
+	let finalPoints = countExtraPoints(longest, longestWoodsPoints)
+	longestWoodsPoints += finalPoints
 
-	let extraPoints = 0;
-
-	if (points > longestWoodsPoints) {
-		extraPoints = points - longestWoodsPoints
-		longestWoodsPoints = points
-	}
-
-	return extraPoints;
+	return finalPoints;
 }
 
 //------------------ surrounded mountains -------------------------//
@@ -219,14 +217,10 @@ function countSurroundedMountains() {
 		}
 	})
 
-	let extraPoints = 0;
+	let finalPoints = countExtraPoints(count, surroundedMountains)
+	surroundedMountains += finalPoints
 
-	if (count > surroundedMountains) {
-		extraPoints = count - surroundedMountains
-		surroundedMountains = count
-	}
-
-	return extraPoints;
+	return finalPoints;
 }
 
 
@@ -251,14 +245,10 @@ function edgeOfTheForest() {
 		}
 	}
 
-	let extraPoints = 0;
+	let finalPoints = countExtraPoints(count, treesOnEdge)
+	treesOnEdge += finalPoints
 
-	if (count > treesOnEdge) {
-		extraPoints = count - treesOnEdge
-		treesOnEdge = count
-	}
-
-	return extraPoints;
+	return finalPoints;
 }
 
 //------------------ borderland------------------------------------//
@@ -298,14 +288,10 @@ function borderLand() {
 		}
 	}
 
-	let extraPoints = 0;
+	let finalPoints = countExtraPoints(count, fullRowsOrColumns)
+	fullRowsOrColumns += finalPoints
 
-	if (count > fullRowsOrColumns) {
-		extraPoints = count - fullRowsOrColumns
-		fullRowsOrColumns = count
-	}
-
-	return extraPoints;
+	return finalPoints;
 }
 
 //------------------ potato watering ------------------------------//
@@ -326,14 +312,10 @@ function potatoWatering() {
 		}
 	}
 
-	let extraPoints = 0;
+	let finalPoints = countExtraPoints(count, wateredPotatos)
+	wateredPotatos += finalPoints
 
-	if (count > wateredPotatos) {
-		extraPoints = count - wateredPotatos
-		wateredPotatos = count
-	}
-
-	return extraPoints;
+	return finalPoints;
 }
 
 function countNeighbours(row, col, type) {
@@ -386,12 +368,8 @@ function sleepyValley() {
 		}
 	}
 
-	let extraPoints = 0;
+	let finalPoints = countExtraPoints(count, threeForestRows)
+	threeForestRows += finalPoints
 
-	if (count > threeForestRows) {
-		extraPoints = count - threeForestRows
-		threeForestRows = count
-	}
-
-	return extraPoints;
+	return finalPoints;
 }
