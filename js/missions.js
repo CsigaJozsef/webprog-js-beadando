@@ -16,13 +16,13 @@ const missions =
 		{
 			"title": "Határvidék",
 			"description": "Minden teli sorért vagy oszlopért 6-6 pontot kapsz."
-		}
-	],
-	"notcompleted": [
+		},
 		{
 			"title": "Fasor",
 			"description": "A leghosszabb, függőlegesen megszakítás nélkül egybefüggő erdőmezők mindegyikéért kettő-kettő pontot kapsz. Két azonos hosszúságú esetén csak az egyikért."
-		},
+		}
+	],
+	"notcompleted": [
 		{
 			"title": "Gazdag város",
 			"description": "A legalább három különböző tereptípussal szomszédos falurégióidért három-három pontot kapsz."
@@ -55,6 +55,28 @@ const missions =
 }
 
 let challengesPoints = [0, 0, 0, 0]
+
+function rollChallenges() {
+    let max = missions["completed"].length
+    let chosen = []
+
+    for (let i = 0; i < challengesCount; ++i) {
+
+        let random;
+
+        do {
+
+            random = getRandomInteger(max);
+
+        } while (chosen.includes(random))
+
+        chosen.push(random)
+    }
+
+    for (let i = 0; i < challengesCount; ++i) {
+        actualChallenges.push(missions["completed"][chosen[i]]);
+    }
+}
 
 function runChallengeCheck() {
 	let count = 0;
@@ -124,8 +146,6 @@ function countLongestWoods() {
 
 			} else if (td.getAttribute("class") !== "forest" && inWoods) {
 
-				console.log("Vége az erdőnek: " + count)
-
 				if (longest < count) {
 					longest = count;
 				}
@@ -134,8 +154,6 @@ function countLongestWoods() {
 				count = 0;
 			}
 		}
-
-		console.log("Vége az erdőnek: " + count)
 
 		if (count > 0 && longest < count) {
 			longest = count;
