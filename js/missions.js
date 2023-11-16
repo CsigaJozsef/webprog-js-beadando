@@ -32,13 +32,14 @@ const missions =
 		{
 			"title": "Mágusok völgye",
 			"description": "A hegymezőiddel szomszédos vízmezőidért három-három pontot kapsz."
-		}
-	],
-	"notcompleted": [
+		},
 		{
 			"title": "Üres telek",
 			"description": "A városmezőiddel szomszédos üres mezőkért 2-2 pontot kapsz."
-		},
+		}
+	],
+	"notcompleted": [
+		
 		{
 			"title": "Sorház",
 			"description": "A leghosszabb, vízszintesen megszakítás nélkül egybefüggő falumezők mindegyikéért kettő-kettő pontot kapsz."
@@ -87,42 +88,55 @@ function runMissionsCheck() {
 	for (let i = 0; i < toCheck.length; ++i) {
 		index = toCheck[i]
 		switch (actualMissions[index]["title"]) {
+
 			case "Az erdő széle":
 				count += edgeOfTheForest();
 				missionsPoints[index] = treesOnEdge;
 				break;
+
 			case "Álmos-völgy":
 				count += sleepyValley();
 				missionsPoints[index] = threeForestRows;
 				break;
+
 			case "Krumpliöntözés":
 				count += potatoWatering();
 				missionsPoints[index] = wateredPotatos;
 				break;
+
 			case "Határvidék":
 				count += borderLand();
 				missionsPoints[index] = fullRowsOrColumns;
 				break;
+
 			case "Fasor":
 				count += countLongestWoods();
 				missionsPoints[index] = longestWoodsPoints;
+				break
+
 			case "Gazdag város":
 				count += countWealthyTowns();
 				missionsPoints[index] = wealthyTownPoints;
+				break;
+
 			case "Öntözőcsatorna":
 				count += countCanals();
 				missionsPoints[index] = canalCountPoints;
+				break;
+
 			case "Mágusok völgye":
 				count += countMageValleys();
 				missionsPoints[index] = mageValleyPoints;
+				break;
+
 			default:
 				break;
 		}
 	}
 
 	console.log(missionsPoints)
-	console.log(countMageValleys())
-	console.log(mageValleyPoints);
+	console.log(countEmptyPlots())
+	console.log(emptyPlotPoints);
 
 	count += countSurroundedMountains()
 
@@ -196,6 +210,53 @@ function getSurroundings(x, y) {
 
 	return surrounding
 }
+//------------------- 
+
+//------------------- empty plot ----------------------------------//
+// can't do distinct
+let emptyPlotPoints = 0;
+let emptyPlotsSet = new Set();
+
+function countEmptyPlotsAround(x, y){
+	let tds = getSurroundings(x, y)
+	let count = 0;
+
+	tds = tds.filter((element) => {
+		return element !== null && element !== undefined
+	})
+
+	tds.forEach((element) => {
+		if(element.getAttribute("class") === null){
+			console.log("empty plot found")
+			emptyPlotsSet.add(""+x+", "+y)
+		}
+	})
+}
+
+function countEmptyPlots(){
+	let count = 0;
+
+	for(let i = 0; i < boardSize; ++i){
+		for(let j = 0; j < boardSize; ++j){
+			
+			let td = getTableElement(board, j, i);
+
+			if(td.getAttribute("class") === "town"){
+				countEmptyPlotsAround(j, i);
+			}
+		}
+	}
+
+	count = emptyPlotsSet.size
+	console.log(emptyPlotsSet)
+	console.log(emptyPlotsSet.size)
+
+	let finalPoints = countExtraPoints(count, emptyPlotPoints);
+	emptyPlotPoints += finalPoints
+
+	return finalPoints;
+}
+
 //------------------- mages valley --------------------------------//
 let mageValleyPoints = 0;
 
@@ -207,7 +268,6 @@ function countValleysAroundMages(x, y) {
 	surroundings.forEach((element) =>{
 		if(element !== null){
 			if(element.getAttribute("class") === "water"){
-				console.log("water found (+3)")
 				count += 3
 			}
 		}
@@ -221,7 +281,6 @@ function countMageValleys() {
 
 	mountains.forEach((mountain) => {
 		count += countValleysAroundMages(mountain["y"], mountain["x"])
-		console.log("count main for: "+count)
 	})
 
 	let finalPoints = countExtraPoints(count, mageValleyPoints);
@@ -270,49 +329,24 @@ let wealthyTownPoints = 0;
 
 function checkIfTownIsWealthy(x, y) {
 	let l = false;
-	let tds = [];
-
-	if (insideOfTableBounds(boardSize, x, y - 1)) {
-
-		let td = getTableElement(board, x, y - 1)
-		let tdUp = td.getAttribute("class")
-
-		if (tdUp !== null) {
-			tds.push(tdUp)
+	
+	let tds = getSurroundings(x, y)
+	
+	let checkableArr = tds.map((element) => {
+		if(element !== null){
+			return element.getAttribute("class")
 		}
-	}
-	if (insideOfTableBounds(boardSize, x - 1, y)) {
+	}).filter((element) => {
+		return element !== null && element !== undefined
+	})
 
-		let td = getTableElement(board, x - 1, y)
-		let tdLeft = td.getAttribute("class")
-
-		if (tdLeft !== null) {
-			tds.push(tdLeft)
-		}
-	}
-	if (insideOfTableBounds(boardSize, x + 1, y)) {
-
-		let td = getTableElement(board, x + 1, y)
-		let tdRight = td.getAttribute("class")
-
-		if (tdRight !== null) {
-			tds.push(tdRight)
-		}
-	}
-	if (insideOfTableBounds(boardSize, x, y + 1)) {
-
-		let td = getTableElement(board, x, y + 1)
-		let tdDown = td.getAttribute("class")
-
-		if (tdDown !== null) {
-			tds.push(tdDown)
-		}
-	}
-
-	const classTypesSet = new Set(tds)
+	const classTypesSet = new Set(checkableArr)
 	if (classTypesSet.size >= 3) {
 		l = true;
 	}
+
+	console.log(checkableArr)
+	console.log(classTypesSet)
 
 	return l;
 }
