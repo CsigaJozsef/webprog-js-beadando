@@ -28,13 +28,13 @@ const missions =
 		{
 			"title": "Öntözőcsatorna",
 			"description": "Minden olyan oszlopodért, amelyben a farm illetve a vízmezők száma megegyezik, négy-négy pontot kapsz. Mindkét tereptípusból legalább egy-egy mezőnek lennie kell az oszlopban ahhoz, hogy pontot kaphass érte."
-		}
-	],
-	"notcompleted": [
+		},
 		{
 			"title": "Mágusok völgye",
 			"description": "A hegymezőiddel szomszédos vízmezőidért három-három pontot kapsz."
-		},
+		}
+	],
+	"notcompleted": [
 		{
 			"title": "Üres telek",
 			"description": "A városmezőiddel szomszédos üres mezőkért 2-2 pontot kapsz."
@@ -112,14 +112,17 @@ function runMissionsCheck() {
 			case "Öntözőcsatorna":
 				count += countCanals();
 				missionsPoints[index] = canalCountPoints;
+			case "Mágusok völgye":
+				count += countMageValleys();
+				missionsPoints[index] = mageValleyPoints;
 			default:
 				break;
 		}
 	}
 
 	console.log(missionsPoints)
-	console.log(countCanals())
-	console.log(canalCountPoints);
+	console.log(countMageValleys())
+	console.log(mageValleyPoints);
 
 	count += countSurroundedMountains()
 
@@ -204,10 +207,13 @@ function countValleysAroundMages(x, y) {
 	surroundings.forEach((element) =>{
 		if(element !== null){
 			if(element.getAttribute("class") === "water"){
+				console.log("water found (+3)")
 				count += 3
 			}
 		}
 	})
+
+	return count;
 }
 
 function countMageValleys() {
@@ -215,10 +221,11 @@ function countMageValleys() {
 
 	mountains.forEach((mountain) => {
 		count += countValleysAroundMages(mountain["y"], mountain["x"])
+		console.log("count main for: "+count)
 	})
 
-	let finalPoints = countExtraPoints(count, canalCountPoints);
-	canalCountPoints += finalPoints
+	let finalPoints = countExtraPoints(count, mageValleyPoints);
+	mageValleyPoints += finalPoints
 
 	return finalPoints;
 }
