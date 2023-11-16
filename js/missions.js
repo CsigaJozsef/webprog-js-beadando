@@ -20,9 +20,7 @@ const missions =
 		{
 			"title": "Fasor",
 			"description": "A leghosszabb, függőlegesen megszakítás nélkül egybefüggő erdőmezők mindegyikéért kettő-kettő pontot kapsz. Két azonos hosszúságú esetén csak az egyikért."
-		}
-	],
-	"notcompleted": [
+		},
 		{
 			"title": "Gazdag város",
 			"description": "A legalább három különböző tereptípussal szomszédos falurégióidért három-három pontot kapsz."
@@ -30,7 +28,9 @@ const missions =
 		{
 			"title": "Öntözőcsatorna",
 			"description": "Minden olyan oszlopodért, amelyben a farm illetve a vízmezők száma megegyezik, négy-négy pontot kapsz. Mindkét tereptípusból legalább egy-egy mezőnek lennie kell az oszlopban ahhoz, hogy pontot kaphass érte."
-		},
+		}
+	],
+	"notcompleted": [
 		{
 			"title": "Mágusok völgye",
 			"description": "A hegymezőiddel szomszédos vízmezőidért három-három pontot kapsz."
@@ -54,28 +54,30 @@ const missions =
 	],
 }
 
+//DISCLAIMER: code not very clean lot of repeating
+
 let missionsPoints = [0, 0, 0, 0]
 
 function rollMissions() {
-    let max = missions["completed"].length
-    let chosen = []
+	let max = missions["completed"].length
+	let chosen = []
 
-    for (let i = 0; i < missionsCount; ++i) {
+	for (let i = 0; i < missionsCount; ++i) {
 
-        let random;
+		let random;
 
-        do {
+		do {
 
-            random = getRandomInteger(max);
+			random = getRandomInteger(max);
 
-        } while (chosen.includes(random))
+		} while (chosen.includes(random))
 
-        chosen.push(random)
-    }
+		chosen.push(random)
+	}
 
-    for (let i = 0; i < missionsCount; ++i) {
-        actualMissions.push(missions["completed"][chosen[i]]);
-    }
+	for (let i = 0; i < missionsCount; ++i) {
+		actualMissions.push(missions["completed"][chosen[i]]);
+	}
 }
 
 function runMissionsCheck() {
@@ -104,12 +106,20 @@ function runMissionsCheck() {
 			case "Fasor":
 				count += countLongestWoods();
 				missionsPoints[index] = longestWoodsPoints;
+			case "Gazdag város":
+				count += countWealthyTowns();
+				missionsPoints[index] = wealthyTownPoints;
+			case "Öntözőcsatorna":
+				count += countCanals();
+				missionsPoints[index] = canalCountPoints;
 			default:
 				break;
 		}
 	}
 
 	console.log(missionsPoints)
+	console.log(countCanals())
+	console.log(canalCountPoints);
 
 	count += countSurroundedMountains()
 
@@ -117,7 +127,7 @@ function runMissionsCheck() {
 	updatePoints(count)
 }
 
-function countExtraPoints(actualPoints, storedPoints){
+function countExtraPoints(actualPoints, storedPoints) {
 	let extraPoints = 0;
 
 	if (actualPoints > storedPoints) {
@@ -126,6 +136,210 @@ function countExtraPoints(actualPoints, storedPoints){
 
 	return extraPoints;
 }
+
+/**
+ * @global Return a list of booleans 
+ * 	(up, left, right, down) of surrounding elements, 
+ * 	true if exists, false if doesn't
+ * @param {number} x 
+ * @param {number} y 
+ */
+
+function getRadarScan(x, y) {
+	//ORDER: 
+	let radar = [false, false, false, false]
+
+	if (insideOfTableBounds(boardSize, x, y - 1)) {
+		radar[0] = true;
+	}
+	if (insideOfTableBounds(boardSize, x - 1, y)) {
+		radar[1] = true;
+	}
+	if (insideOfTableBounds(boardSize, x + 1, y)) {
+		radar[2] = true;
+	}
+	if (insideOfTableBounds(boardSize, x, y + 1)) {
+		radar[3] = true;
+	}
+
+	return radar
+}
+
+/**
+ * @global Return a list of tds 
+ * 	(up, left, right, down) of surrounding elements, 
+ * 	null if there are no elements
+ * @param {number} x 
+ * @param {number} y
+ * @returns {td[]}
+ */
+
+function getSurroundings(x, y) {
+	let radarScan = getRadarScan(x, y)
+	let surrounding = [null, null, null, null]
+
+	if (radarScan[0]) {
+		surrounding[0] = getTableElement(board, x, y - 1);
+	}
+	if (radarScan[1]) {
+		surrounding[1] = getTableElement(board, x - 1, y);
+	}
+	if (radarScan[2]) {
+		surrounding[2] = getTableElement(board, x + 1, y);
+	}
+	if (radarScan[3]) {
+		surrounding[3] = getTableElement(board, x, y + 1);
+	}
+
+	return surrounding
+}
+//------------------- mages valley --------------------------------//
+let mageValleyPoints = 0;
+
+function countValleysAroundMages(x, y) {
+	let count = 0;
+
+	let surroundings = getSurroundings(x, y)
+
+	surroundings.forEach((element) =>{
+		if(element !== null){
+			if(element.getAttribute("class") === "water"){
+				count += 3
+			}
+		}
+	})
+}
+
+function countMageValleys() {
+	let count = 0;
+
+	mountains.forEach((mountain) => {
+		count += countValleysAroundMages(mountain["y"], mountain["x"])
+	})
+
+	let finalPoints = countExtraPoints(count, canalCountPoints);
+	canalCountPoints += finalPoints
+
+	return finalPoints;
+}
+//------------------- irrigation canal ----------------------------//
+let canalCountPoints = 0;
+
+function countCanals() {
+	let count = 0;
+
+	for (let col = 0; col < boardSize; ++col) {
+
+		let farmCount = 0;
+		let waterCount = 0;
+
+		for (let row = 0; row < boardSize; ++row) {
+
+			let td = getTableElement(board, col, row);
+
+			if (td.getAttribute("class") === "farm") {
+				++farmCount;
+			}
+
+			if (td.getAttribute("class") === "water") {
+				++waterCount;
+			}
+		}
+
+		if (farmCount == waterCount && farmCount > 0) {
+			console.log("canal found: " + col)
+			count += 4;
+		}
+	}
+
+	let finalPoints = countExtraPoints(count, canalCountPoints);
+	canalCountPoints += finalPoints
+
+	return finalPoints;
+}
+
+//------------------- wealthy town --------------------------------//
+let wealthyTownPoints = 0;
+
+function checkIfTownIsWealthy(x, y) {
+	let l = false;
+	let tds = [];
+
+	if (insideOfTableBounds(boardSize, x, y - 1)) {
+
+		let td = getTableElement(board, x, y - 1)
+		let tdUp = td.getAttribute("class")
+
+		if (tdUp !== null) {
+			tds.push(tdUp)
+		}
+	}
+	if (insideOfTableBounds(boardSize, x - 1, y)) {
+
+		let td = getTableElement(board, x - 1, y)
+		let tdLeft = td.getAttribute("class")
+
+		if (tdLeft !== null) {
+			tds.push(tdLeft)
+		}
+	}
+	if (insideOfTableBounds(boardSize, x + 1, y)) {
+
+		let td = getTableElement(board, x + 1, y)
+		let tdRight = td.getAttribute("class")
+
+		if (tdRight !== null) {
+			tds.push(tdRight)
+		}
+	}
+	if (insideOfTableBounds(boardSize, x, y + 1)) {
+
+		let td = getTableElement(board, x, y + 1)
+		let tdDown = td.getAttribute("class")
+
+		if (tdDown !== null) {
+			tds.push(tdDown)
+		}
+	}
+
+	const classTypesSet = new Set(tds)
+	if (classTypesSet.size >= 3) {
+		l = true;
+	}
+
+	return l;
+}
+
+function countWealthyTowns() {
+
+	let td;
+	let wealthy;
+	let count = 0;
+
+	for (let i = 0; i < boardSize; ++i) {
+		for (let j = 0; j < boardSize; ++j) {
+
+			td = getTableElement(board, j, i)
+			wealthy = false;
+
+			if (td.getAttribute("class") === "town") {
+				wealthy = checkIfTownIsWealthy(j, i);
+			}
+
+			if (wealthy) {
+				count += 3;
+			}
+
+		}
+	}
+
+	let finalPoints = countExtraPoints(count, wealthyTownPoints);
+	wealthyTownPoints += finalPoints
+
+	return finalPoints;
+
+}
+
 
 //------------------ longest woods --------------------------------//
 let longestWoodsPoints = 0;
@@ -173,18 +387,12 @@ function countLongestWoods() {
 //------------------ surrounded mountains -------------------------//
 let surroundedMountains = 0;
 
-function cellExists(x, y) {
-	let l = true;
-	if (x < 0 || x > 10 || y > 10 || y < 0) {
-		l = false;
-	}
-	return l;
-}
-
 function isSurrounded(x, y) {
+
 	let l = true;
 	let actX;
 	let actY;
+
 	for (let i = 0; i < 8; ++i) {
 		if (i < 3) {
 			actX = x - 1
@@ -197,8 +405,8 @@ function isSurrounded(x, y) {
 			actY = y + 6 - i
 		}
 
-		if (cellExists(actX, actY)) {
-			let td = board.rows[actX].cells[actY]
+		if (insideOfTableBounds(boardSize, actX, actY)) {
+			let td = getTableElement(board, actX, actY)
 			if (td.getAttribute("class") === null) {
 				l = false;
 			}
@@ -212,7 +420,7 @@ function countSurroundedMountains() {
 	let count = 0;
 
 	mountains.forEach((mountain) => {
-		if (isSurrounded(mountain["x"], mountain["y"])) {
+		if (isSurrounded(mountain["y"], mountain["x"])) {
 			count += 1;
 		}
 	})
@@ -228,8 +436,10 @@ function countSurroundedMountains() {
 let treesOnEdge = 0;
 
 function edgeOfTheForest() {
+
 	let count = 0;
 	let edgetds = 0;
+
 	for (let i = 0; i < boardSize; ++i) {
 		for (let j = 0; j < boardSize; ++j) {
 			// only checks edges of the table
@@ -237,8 +447,9 @@ function edgeOfTheForest() {
 				continue;
 			}
 
-			td = board.rows[i].cells[j];
+			let td = getTableElement(board, j, i)
 			edgetds += 1;
+
 			if (td.getAttribute("class") === 'forest') {
 				count += 1;
 			}
@@ -259,7 +470,7 @@ function borderLand() {
 	for (let row = 0; row < boardSize; ++row) {
 		for (let col = 0; col < boardSize; ++col) {
 
-			td = board.rows[row].cells[col];
+			let td = getTableElement(board, col, row);
 
 			//skip to next row
 			if (td.getAttribute("class") === null) {
@@ -275,7 +486,7 @@ function borderLand() {
 	for (let col = 0; col < boardSize; ++col) {
 		for (let row = 0; row < boardSize; ++row) {
 
-			td = board.rows[row].cells[col];
+			let td = getTableElement(board, col, row);
 
 			//skip to next col
 			if (td.getAttribute("class") === null) {
@@ -303,7 +514,7 @@ function potatoWatering() {
 	for (let row = 0; row < boardSize; ++row) {
 		for (let col = 0; col < boardSize; ++col) {
 
-			td = board.rows[row].cells[col];
+			let td = getTableElement(board, col, row)
 
 			//skip to next row
 			if (td.getAttribute("class") === 'farm') {
@@ -349,13 +560,15 @@ function countNeighbours(row, col, type) {
 let threeForestRows = 0;
 
 function sleepyValley() {
-	count = 0;
+	let count = 0;
 	let forestCount;
+	let td;
+
 	for (let row = 0; row < boardSize; ++row) {
 		forestCount = 0;
 		for (let col = 0; col < boardSize; ++col) {
 
-			td = board.rows[row].cells[col];
+			td = getTableElement(board, col, row)
 
 			if (td.getAttribute("class") === 'forest') {
 				++forestCount;
