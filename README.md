@@ -34,11 +34,11 @@ A fegyelmi vétség legsúlyosabb következménye a hallgató elbocsátása az e
 
 ### Extrák (10 pont)
 [x] Küldetés: Fasor (1 pont)<br />
-[ ] Küldetés: Öntözőcsatorna (1 pont)<br />
-[ ] Küldetés: Gazdag város (1 pont)<br />
-[ ] Küldetés: Mágusokvölgye (1 pont)<br />
-[ ] Küldetés: Üres telek (1 pont)<br />
-[ ] Küldetés: Sorház (1 pont)<br />
-[ ] Küldetés: Páratlan silók (1 pont)<br />
-[ ] Küldetés: Gazdag vidék (1 pont)<br />
+[x] Küldetés: Öntözőcsatorna (1 pont)<br />
+[x] Küldetés: Gazdag város (1 pont)<br />
+[x] Küldetés: Mágusokvölgye (1 pont)<br />
+[x] Küldetés: Üres telek (1 pont)<br />
+[x] Küldetés: Sorház (1 pont)<br />
+[x] Küldetés: Páratlan silók (1 pont)<br />
+[x] Küldetés: Gazdag vidék (1 pont)<br />
 [ ] Mentés: A játék folyamatosan menti állapotát a localStorage-ba. Oldal betöltésekor, ha van itt ilyen mentett állapot, akkor onnan tölti be, egyébként új játék indul. Játék végén törlődik a mentett állapot. (2 pont)<br />
