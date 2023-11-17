@@ -36,10 +36,7 @@ const missions =
 		{
 			"title": "Üres telek",
 			"description": "A városmezőiddel szomszédos üres mezőkért 2-2 pontot kapsz."
-		}
-	],
-	"notcompleted": [
-		
+		},
 		{
 			"title": "Sorház",
 			"description": "A leghosszabb, vízszintesen megszakítás nélkül egybefüggő falumezők mindegyikéért kettő-kettő pontot kapsz."
@@ -53,9 +50,8 @@ const missions =
 			"description": "Minden legalább öt különböző tereptípust tartalmazó sorért négy-négy pontot kapsz."
 		}
 	],
+	"notcompleted": [],
 }
-
-//DISCLAIMER: code not very clean lot of repeating
 
 let missionsPoints = [0, 0, 0, 0]
 
@@ -129,14 +125,32 @@ function runMissionsCheck() {
 				missionsPoints[index] = mageValleyPoints;
 				break;
 
+			case "Üres telek":
+				count += countEmptyPlots();
+				missionsPoints[index] = emptyPlotPoints;
+				break;
+
+			case "Sorház":
+				count += countLongestHouseRows();
+				missionsPoints[index] = longestHouses;
+				break;
+
+			case "Páratlan silók":
+				count += countOddSilos();
+				missionsPoints[index] = oddSiloPoints;
+				break;
+
+			case "Gazdag vidék":
+				count += countWealthyAreas();
+				missionsPoints[index] = wealthyAreaPoints;
+				break;
+
 			default:
 				break;
 		}
 	}
 
 	console.log(missionsPoints)
-	console.log(countEmptyPlots())
-	console.log(emptyPlotPoints);
 
 	count += countSurroundedMountains()
 
@@ -210,14 +224,110 @@ function getSurroundings(x, y) {
 
 	return surrounding
 }
-//------------------- 
 
+function countLongestInRow(elementType) {
+
+	let longest = 0;
+
+	for (let row = 0; row < boardSize; ++row) {
+
+		let count = 0;
+		let inside = false;
+
+		for (let col = 0; col < boardSize; ++col) {
+
+			let td = getTableElement(board, col, row)
+
+			if (td.getAttribute("class") === elementType) {
+
+				count += 1;
+				inside = true;
+
+			} else if (td.getAttribute("class") !== elementType && inside) {
+
+				if (longest < count) {
+					longest = count;
+				}
+
+				inside = false;
+				count = 0;
+			}
+		}
+
+		if (count > 0 && longest < count) {
+			longest = count;
+		}
+	}
+
+	return longest
+}
+//------------------- wealthy area --------------------------------//
+let wealthyAreaPoints = 0;
+
+function countWealthyAreas() {
+
+	for (let row = 0; row < boardSize; ++row) {
+
+		let distinctAreas = new Set();
+
+		for (let col = 0; col < boardSize; ++col) {
+
+			let td = getTableElement(board, col, row);
+
+			if (td.getAttribute("class") !== null) {
+				distinctAreas.add(td.getAttribute("class"))
+			}
+		}
+
+		if (distinctAreas.size >= 5) {
+			count += 4;
+		}
+	}
+}
+
+//------------------- odd silos -----------------------------------//
+let oddSiloPoints = 0;
+
+function countOddSilos() {
+	let count = 0;
+
+	for (let col = 0; col < boardSize; col += 2) {
+		if (isColFull(col)) {
+			count += 10;
+		}
+	}
+
+	let finalPoints = countExtraPoints(count, oddSiloPoints);
+	oddSiloPoints += finalPoints
+
+	return finalPoints;
+}
+
+//------------------- house rows ----------------------------------//
+let longestHouses = 0;
+
+function countLongestHouseRows() {
+	let count = 0;
+
+	count = countLongestInRow("town") * 2;
+
+	let finalPoints = countExtraPoints(count, longestHouses);
+	longestHouses += finalPoints
+
+	return finalPoints;
+}
 //------------------- empty plot ----------------------------------//
 // can't do distinct
 let emptyPlotPoints = 0;
-let emptyPlotsSet = new Set();
+let emptyPlotsDistinctArr = [];
 
-function countEmptyPlotsAround(x, y){
+function addIfNotAlreadyIn(distinctArray, element){
+	if(!distinctArray.includes(element)){
+		distinctArray.push(element);
+	}
+}
+
+function countEmptyPlotsAround(x, y) {
 	let tds = getSurroundings(x, y)
 	let count = 0;
 
@@ -226,30 +336,27 @@ function countEmptyPlotsAround(x, y){
 	})
 
 	tds.forEach((element) => {
-		if(element.getAttribute("class") === null){
-			console.log("empty plot found")
-			emptyPlotsSet.add(""+x+", "+y)
+		if (element.getAttribute("class") === null) {
+			addIfNotAlreadyIn(emptyPlotsDistinctArr, element)
 		}
 	})
 }
 
-function countEmptyPlots(){
+function countEmptyPlots() {
 	let count = 0;
 
-	for(let i = 0; i < boardSize; ++i){
-		for(let j = 0; j < boardSize; ++j){
-			
+	for (let i = 0; i < boardSize; ++i) {
+		for (let j = 0; j < boardSize; ++j) {
+
 			let td = getTableElement(board, j, i);
 
-			if(td.getAttribute("class") === "town"){
+			if (td.getAttribute("class") === "town") {
 				countEmptyPlotsAround(j, i);
 			}
 		}
 	}
 
-	count = emptyPlotsSet.size
-	console.log(emptyPlotsSet)
-	console.log(emptyPlotsSet.size)
+	count = emptyPlotsDistinctArr.length * 2
 
 	let finalPoints = countExtraPoints(count, emptyPlotPoints);
 	emptyPlotPoints += finalPoints
@@ -265,9 +372,9 @@ function countValleysAroundMages(x, y) {
 
 	let surroundings = getSurroundings(x, y)
 
-	surroundings.forEach((element) =>{
-		if(element !== null){
-			if(element.getAttribute("class") === "water"){
+	surroundings.forEach((element) => {
+		if (element !== null) {
+			if (element.getAttribute("class") === "water") {
 				count += 3
 			}
 		}
@@ -313,7 +420,6 @@ function countCanals() {
 		}
 
 		if (farmCount == waterCount && farmCount > 0) {
-			console.log("canal found: " + col)
 			count += 4;
 		}
 	}
@@ -329,11 +435,11 @@ let wealthyTownPoints = 0;
 
 function checkIfTownIsWealthy(x, y) {
 	let l = false;
-	
+
 	let tds = getSurroundings(x, y)
-	
+
 	let checkableArr = tds.map((element) => {
-		if(element !== null){
+		if (element !== null) {
 			return element.getAttribute("class")
 		}
 	}).filter((element) => {
@@ -344,9 +450,6 @@ function checkIfTownIsWealthy(x, y) {
 	if (classTypesSet.size >= 3) {
 		l = true;
 	}
-
-	console.log(checkableArr)
-	console.log(classTypesSet)
 
 	return l;
 }
@@ -381,7 +484,6 @@ function countWealthyTowns() {
 
 }
 
-
 //------------------ longest woods --------------------------------//
 let longestWoodsPoints = 0;
 
@@ -389,35 +491,7 @@ function countLongestWoods() {
 
 	let longest = 0;
 
-	for (let row = 0; row < boardSize; ++row) {
-
-		let count = 0;
-		let inWoods = false;
-
-		for (let col = 0; col < boardSize; ++col) {
-
-			let td = getTableElement(board, col, row)
-
-			if (td.getAttribute("class") === "forest") {
-
-				count += 2;
-				inWoods = true;
-
-			} else if (td.getAttribute("class") !== "forest" && inWoods) {
-
-				if (longest < count) {
-					longest = count;
-				}
-
-				inWoods = false;
-				count = 0;
-			}
-		}
-
-		if (count > 0 && longest < count) {
-			longest = count;
-		}
-	}
+	longest = countLongestInRow("forest") * 2
 
 	let finalPoints = countExtraPoints(longest, longestWoodsPoints)
 	longestWoodsPoints += finalPoints
@@ -504,39 +578,59 @@ function edgeOfTheForest() {
 }
 
 //------------------ borderland------------------------------------//
+function isRowFull(row) {
+	let l = false;
+
+	for (let col = 0; col < boardSize; ++col) {
+
+		let td = getTableElement(board, col, row);
+
+		//skip row
+		if (td.getAttribute("class") === null) {
+			break;
+		}
+
+		if (col === boardSize - 1) {
+			l = true;
+		}
+	}
+
+	return l;
+}
+
+function isColFull(col) {
+	let l = false;
+
+	for (let row = 0; row < boardSize; ++row) {
+
+		let td = getTableElement(board, col, row);
+
+		//skip col
+		if (td.getAttribute("class") === null) {
+			break;
+		}
+
+		if (row === boardSize - 1) {
+			l = true;
+		}
+	}
+
+	return l;
+}
+
 let fullRowsOrColumns = 0;
 
 function borderLand() {
 	count = 0;
 	for (let row = 0; row < boardSize; ++row) {
-		for (let col = 0; col < boardSize; ++col) {
-
-			let td = getTableElement(board, col, row);
-
-			//skip to next row
-			if (td.getAttribute("class") === null) {
-				break;
-			}
-
-			if (col === boardSize - 1) {
-				count += 6;
-			}
+		if (isRowFull(row)) {
+			count += 6;
 		}
 	}
 
 	for (let col = 0; col < boardSize; ++col) {
-		for (let row = 0; row < boardSize; ++row) {
-
-			let td = getTableElement(board, col, row);
-
-			//skip to next col
-			if (td.getAttribute("class") === null) {
-				break;
-			}
-
-			if (row === boardSize - 1) {
-				count += 6;
-			}
+		if (isColFull(col)) {
+			count += 6;
 		}
 	}
 
@@ -613,12 +707,10 @@ function sleepyValley() {
 
 			if (td.getAttribute("class") === 'forest') {
 				++forestCount;
-				// console.log("found forest: "+row+":"+col)
 			}
 		}
 		if (forestCount === 3) {
 			count += 4;
-			// console.log("found row: "+row)
 		}
 	}
 
